@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# configuration
+DEBUGGER="colour-valgrind --leak-check=full --track-origins=yes"
+
+# info to extract from
+DEBUG=false
+INPUT_PATH=""
+COMPILER_ARGUMENTS=""
+PROGRAM_ARGUMENTS=""
+
+# arguments interpretation
+for ARGUMENT in "$@"; do
+    if [ -z "$INPUT_PATH" ] ; then
+        if [ "$ARGUMENT" == "-d" ] ; then
+            DEBUG=true
+            COMPILER_ARGUMENTS="$COMPILER_ARGUMENTS $ARGUMENT"
+        elif [ -f "$ARGUMENT" ] ; then
+            INPUT_PATH="$ARGUMENT"
+        else
+            COMPILER_ARGUMENTS="$COMPILER_ARGUMENTS $ARGUMENT"
+        fi
+    else
+        PROGRAM_ARGUMENTS=${PROGRAM_ARGUMENTS}${PROGRAM_ARGUMENTS:+ }
+        if [[ "$ARGUMENT" =~ \ |\'|\" ]]; then
+            # if the argument contains space(s) or quotes, escape ' and \ and the put ' around it
+            PROGRAM_ARGUMENTS=${PROGRAM_ARGUMENTS}$(printf "%s\n" "$ARGUMENT" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "\$s/\$/'/")
+        else
+            PROGRAM_ARGUMENTS="$PROGRAM_ARGUMENTS $ARGUMENT"
+        fi
+    fi
+done
+
+# debugging options
+if [ "${DEBUG}" = true ] ; then
+    EXECUTION_PRECOMMAND="$DEBUGGER"
+else
+    EXECUTION_PRECOMMAND=""
+fi
+
+# current script exits whenever a command fails
+set -e
+
+# compile
+./compile ${COMPILER_ARGUMENTS} ${INPUT_PATH}
+
+# execute generated program
+OUTPUT_PATH="$(sed 's/^src\///' <<< $INPUT_PATH)"
+OUTPUT_PATH="${OUTPUT_PATH%.*}"
+OUTPUT_PATH="bin/$OUTPUT_PATH"
+
+echo
+echo ${EXECUTION_PRECOMMAND} ./${OUTPUT_PATH} ${PROGRAM_ARGUMENTS}
+echo
+time eval "${EXECUTION_PRECOMMAND} ./${OUTPUT_PATH} ${PROGRAM_ARGUMENTS}"

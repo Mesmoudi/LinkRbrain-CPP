@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# configuration
+
+CLANG_VERSION=11
+DEPENDENCIES="libjson-c-dev postgresql libpq-dev libmicrohttpd-dev libcurl4-openssl-dev zlib1g-dev libnifti-dev libhpdf-dev libc++abi-dev librsvg2-dev libcairo2-dev libgdk-pixbuf2.0-dev"
+
+# Useful functions
+
+function show_subtitle() {
+    echo
+    printf "\e[33m"
+    printf "$@"
+    printf "\e[0m\n"
+    echo
+}
+
+function package_exists() {
+    apt-cache show "$1" &> /dev/null
+    return $?
+}
+
+function package_installed() {
+    dpkg -s "$1" &> /dev/null
+    return $?
+}
+
+function install_package_if_not_present() {
+    if package_installed $1; then
+        echo "Le paquet $1 est déjà installé.";
+    else
+        if ! sudo apt-get install -y "$1"; then
+            echo "ERREUR: impossible d'installer le paquet $1"
+        fi
+    fi
+}
+
+function link_include_if_missing() {
+    if [ ! -e /usr/include/$1 ]; then
+        echo "/usr/include/$1 introuvable, création d'un lien symbolique"
+        sudo ln -sf `locate -e -b \\\\$1 | grep /usr/include` /usr/include/
+    fi
+}
+
+# Install repository manager & compiler
+
+show_subtitle "Recherche des paquets"
+install_package_if_not_present "git"
+install_package_if_not_present "git-lfs"
+CLANG_PACKAGE=clang-$CLANG_VERSION
+if package_installed $CLANG_PACKAGE; then
+    echo "Le paquet $CLANG_PACKAGE est déjà installé.";
+elif package_exists $CLANG_PACKAGE; then
+    echo "Le paquet $CLANG_PACKAGE est disponible dans les dépôts.";
+    sudo apt-get install -y $CLANG_PACKAGE
+else
+    echo "Utilisation du script LLVM pour installer $CLANG_PACKAGE.";
+    wget https://apt.llvm.org/llvm.sh
+    chmod +x llvm.sh
+    sudo ./llvm.sh $CLANG_VERSION
+    CLANG_INSTALLATION_RESULT=$?
+    rm llvm.sh
+    if ! $CLANG_INSTALLATION_RESULT; then
+        sudo apt-get install -y $CLANG_PACKAGE
+    fi
+fi
+
+# Setup dependencies
+
+for PACKAGE in $DEPENDENCIES; do
+    install_package_if_not_present $PACKAGE
+done
+
+# Download fonts
+
+FONTS_DIRECTORY=var/fonts
+if [ ! -d $FONTS_DIRECTORY/ubuntu ]; then
+    mkdir -p $FONTS_DIRECTORY
+    wget https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip -O $FONTS_DIRECTORY/roboto.zip
+    unzip -u $FONTS_DIRECTORY/roboto.zip -d $FONTS_DIRECTORY
+    mv $FONTS_DIRECTORY/ubuntu-font-family-0.83 $FONTS_DIRECTORY/ubuntu
+    rm -rf $FONTS_DIRECTORY/__MACOSX $FONTS_DIRECTORY/ubuntu.zip
+fi
+if [ ! -d $FONTS_DIRECTORY/roboto ]; then
+    mkdir -p $FONTS_DIRECTORY
+    wget https://fonts.google.com/download?family=Roboto -O $FONTS_DIRECTORY/roboto.zip
+    unzip -u $FONTS_DIRECTORY/roboto.zip -d $FONTS_DIRECTORY/roboto
+fi
+
+# Fix broken includes
+
+show_subtitle "Mise à jour de la base de donnée des emplacements de fichier"
+install_package_if_not_present mlocate
+sudo updatedb && echo "Mise à jour effectuée."
+
+show_subtitle "Réparation des includes"
+sudo sed -i 's/#include <znzlib.h>/#include "znzlib.h"/' `locate -l 1 -e -b \\nifti1_io.h`
+link_include_if_missing librsvg
+sudo sed -i 's/#include <cairo\([-\.]\)/#include <cairo\/cairo\1/g' `locate -l 1 -e -b rsvg.h`
+sudo sed -i 's/#include <cairo\([-\.]\)/#include <cairo\/cairo\1/g' `locate -l 1 -e -b rsvg-cairo.h`
+link_include_if_missing glib.h
+link_include_if_missing glibmmconfig.h
+link_include_if_missing glib-object.h
+link_include_if_missing glib-unix.h
+link_include_if_missing glibconfig.h
+link_include_if_missing gmodule.h
+link_include_if_missing glibmm
+link_include_if_missing glib
+link_include_if_missing gobject
+link_include_if_missing gio
+link_include_if_missing gdk-pixbuf
+echo

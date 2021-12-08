@@ -1,0 +1,99 @@
+#!/bin/bash
+
+# Database configuration
+
+DATABASE_DEFAULT_DBNAME=linkrbrain_database
+DATABASE_DEFAULT_SCHEMA=public
+DATABASE_DEFAULT_USER=linkrbrain_database_user
+DATABASE_DEFAULT_PASSWORD=linkrbrain_database_password_2019
+
+# Configuration
+
+GIT_BRANCH=release-2
+
+# Useful functions
+
+function show_title() {
+    echo
+    printf "\e[33;1m"
+    printf "$@"
+    printf "\e[0m\n"
+    echo
+}
+function show_subtitle() {
+    echo
+    printf "\e[33m"
+    printf "$@"
+    printf "\e[0m\n"
+    echo
+}
+
+# Check updates
+
+show_title "Vérification des mises à jour disponibles du projet"
+git config credential.helper 'cache --timeout=86400'
+git checkout "$GIT_BRANCH"
+git pull origin "$GIT_BRANCH"
+
+# Install dependencies
+show_title "Installation des paquets nécessaires à l'installation"
+./install_dependencies
+
+# Compile project
+
+set -e
+show_title "Compilation du projet"
+./compile src/linkrbrain.cpp
+rm -f linkrbrain
+ln -sf bin/linkrbrain linkrbrain
+
+# Fetch data if required
+
+show_title "Datasets par défaut"
+read -n 1 -r -p "Voulez-vous initialiser de façon automatique les datasets définis par défaut ? [o/N] " USER_CHOICE
+echo
+if [[ $USER_CHOICE =~ ^[oO]$ ]]; then
+    ./install_datasets
+fi
+echo
+
+# Setup database
+
+set -e
+show_title "Mise en place de la base de données"
+
+show_subtitle "Paramétrage"
+read -r -p "Nom de la base de données [$DATABASE_DEFAULT_DBNAME] : " DATABASE_DBNAME
+DATABASE_DBNAME=${DATABASE_DBNAME:-$DATABASE_DEFAULT_DBNAME}
+read -r -p "Schéma de la base de données [$DATABASE_DEFAULT_SCHEMA] : " DATABASE_SCHEMA
+DATABASE_SCHEMA=${DATABASE_SCHEMA:-$DATABASE_DEFAULT_SCHEMA}
+read -r -p "Nom de l'utilisateur de base de données [$DATABASE_DEFAULT_USER] : " DATABASE_USER
+DATABASE_USER=${DATABASE_USER:-$DATABASE_DEFAULT_USER}
+read -r -p "Mot de passe de l'utilisateur de base de données [$DATABASE_DEFAULT_PASSWORD] : " DATABASE_PASSWORD
+DATABASE_PASSWORD=${DATABASE_PASSWORD:-$DATABASE_DEFAULT_PASSWORD}
+show_subtitle "Création de la base de données"
+cat install.sql | sed -e "s/__DBNAME__/$DATABASE_DBNAME/g" -e "s/__SCHEMA__/$DATABASE_SCHEMA/g" -e "s/__USER__/$DATABASE_USER/g" -e "s/__PASSWORD__/$DATABASE_PASSWORD/g" | sudo -u postgres psql
+
+show_subtitle "Test de connection"
+psql -d "user=$DATABASE_USER password=$DATABASE_PASSWORD dbname=$DATABASE_DBNAME" -c "SELECT * FROM $DATABASE_SCHEMA.users;"
+if [ $? -eq 0 ]; then
+    echo "Connexion à la base de données réussie."
+else
+    echo "Echec de connection à la base de données."
+    echo "Essayez d'éditer /etc/postgresql/pg_hba.conf et de remplacer :"
+    echo "local  all      all          peer"
+    echo "Par :"
+    echo "local  all      all          md5"
+    exit 1
+fi
+
+show_subtitle "Création d'un fichier de configuration"
+cat etc/db.template.json | sed -e "s/__DBNAME__/$DATABASE_DBNAME/g" -e "s/__SCHEMA__/$DATABASE_SCHEMA/g" -e "s/__USER__/$DATABASE_USER/g" -e "s/__PASSWORD__/$DATABASE_PASSWORD/g" > etc/db.json
+echo "etc/db.json"
+
+show_subtitle "Création d'un utilisateur"
+read -n 1 -r -p "Voulez-vous créer un nouvel utilisateur ? [o/N] " USER_CHOICE
+echo
+if [[ $USER_CHOICE =~ ^[oO]$ ]]; then
+    ./linkrbrain user add
+fi

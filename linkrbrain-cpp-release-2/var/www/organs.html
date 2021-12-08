@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<script type="text/javascript"></script>
+		<link rel="stylesheet" href="/style.css" type="text/css"/>
+		<title>Pick an organ you want to work on</title>
+	</head>
+	<body>
+
+		<div id="contents">
+			<div id="middle">
+				<div id="right">
+					<h2>Pick an organ you want to work on</h2>
+
+					<a class="inset-square" href="/platform/adult-human-brain">
+					    <h3>Adult human brain</h3>
+					    <div class="picture">
+					        <img src="/screenshots/adult.png" style="width:auto;height:100%" />
+					    </div>
+						<p>Adult human brain</p>
+						<p>Using <strong>MNI152</strong> standard-space for representation and computation</p>
+					</a>
+
+					<a class="inset-square" href="/platform/neonatal-human-brain">
+					    <h3>Neonatal human brain</h3>
+					    <div class="picture">
+					        <img src="/screenshots/neonatal.png" style="width:auto;height:100%" />
+					    </div>
+						<p>Neonatal human brain</p>
+						<p>Using <strong>Feng Shi et al.</strong> neonatal brain atlas, based on 95 subjects</p>
+					</a>
+
+				</div>
+			</div>
+		</div>
+
+		<div id="top">
+			<div class="logo">
+				<h1><a href="/"><span>{</span> link<span>R</span>brain <span>}</span></a></h1>
+    			<a href="/">online tool for neuroscience</a>
+			</div>
+			<div class="menu">
+	    		<div>
+			        <a href="/">Presentation</a>
+			        <a href="/people/">About us</a>
+			    </div>
+			</div>
+			<div class="try">
+			    <a href="/query/">Try it now!</a>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			window.onresize = function(){
+				var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				document.body.style.fontSize = Math.round(8 + width / 160) + 'px';
+			};
+			window.onresize();
+		</script>
+
+	</body>
+</html>

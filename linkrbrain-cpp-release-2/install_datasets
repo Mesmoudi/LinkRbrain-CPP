@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Configuration
+
+
+DEFAULT_DATA_DIRECTORY=data/default
+DEFAULT_DATA_REPOSITORY="https://gitlab.iscpif.fr/MathieuR/linkrbrain-data"
+CURRENT_DIRECTORY=$(pwd)
+GIT_BRANCH=release-2
+
+
+# method
+
+function show_subtitle() {
+    echo
+    printf "\e[33m"
+    printf "$@"
+    printf "\e[0m\n"
+    echo
+}
+
+
+set +e
+
+# clone or update data from remote (using git-lfs)
+show_subtitle "Récupération des données depuis le serveur de l'ISC"
+if [ -d "$DEFAULT_DATA_DIRECTORY" ]; then
+    read -n 1 -r -p "Voulez-vous rechercher des mises à jour pour les données des datasets par défaut ? [o/N] " USER_CHOICE
+    echo
+    if [[ $USER_CHOICE =~ ^[oO]$ ]]; then
+        cd "$DEFAULT_DATA_DIRECTORY"
+        git checkout $GIT_BRANCH
+        git pull origin $GIT_BRANCH
+        cd $CURRENT_DIRECTORY
+    fi
+else
+    git clone --branch $GIT_BRANCH "$DEFAULT_DATA_REPOSITORY" "$DEFAULT_DATA_DIRECTORY"
+fi
+# initialize parameters
+ORGAN_LABEL="Adult human brain"
+DATASETS_LABELS="functions genes"
+DATASETS_SOURCE_PATH="$DEFAULT_DATA_DIRECTORY/$ORGAN_LABEL/Datasets"
+# install organ if not already present
+./linkrbrain organ add --if-not-exists --label "$ORGAN_LABEL"
+set +e
+# install datasets
+for DATASET_LABEL in $DATASETS_LABELS; do
+    DATASET_SOURCE_PATH="$DATASETS_SOURCE_PATH/$DATASET_LABEL"
+    show_subtitle "Dataset '$DATASET_LABEL': décompression des données"
+    tar xzvf "$DATASET_SOURCE_PATH.tar.gz" -C "$DATASETS_SOURCE_PATH"
+    show_subtitle "Dataset $DATASET_LABEL: intégration des données"
+    if [[ $DATASET_LABEL = "genes" ]]; then
+        ./linkrbrain dataset add --organ "$ORGAN_LABEL" --label "$DATASET_LABEL" --type allen --source "$DATASET_SOURCE_PATH"
+    else
+        ./linkrbrain dataset add --organ "$ORGAN_LABEL" --label "$DATASET_LABEL" --type barycenters --prefix barycenter_t_ --source "$DATASET_SOURCE_PATH"
+    fi
+done
+# display result
+show_subtitle "Vérification des données présentes"
+./linkrbrain dataset list

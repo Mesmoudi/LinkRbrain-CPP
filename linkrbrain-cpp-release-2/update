@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Which branch
+
+if [ -z "$1" ]; then
+    GIT_BRANCH=release-2
+else
+    GIT_BRANCH=$1
+fi
+
+# Useful functions
+
+function show_title() {
+    echo
+    printf "\e[33;1m"
+    printf "$@"
+    printf "\e[0m\n"
+    echo
+}
+
+# Check updates
+
+show_title "Vérification des mises à jour disponibles du projet"
+git config credential.helper 'cache --timeout=86400'
+git checkout "$GIT_BRANCH"
+git pull origin "$GIT_BRANCH"
+
+# Install dependencies
+show_title "Installation des dépendances"
+./install_dependencies
+
+# Compile project
+
+set -e
+show_title "Compilation du projet"
+./compile src/linkrbrain.cpp
+rm -f linkrbrain
+ln -sf bin/linkrbrain linkrbrain
+
+# Update datasets
+
+show_title "Mise à jour des datasets"
+./update_datasets $GIT_BRANCH

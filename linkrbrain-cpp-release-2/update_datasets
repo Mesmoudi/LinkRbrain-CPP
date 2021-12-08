@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Les datasets sont à jour pour $1."
+echo

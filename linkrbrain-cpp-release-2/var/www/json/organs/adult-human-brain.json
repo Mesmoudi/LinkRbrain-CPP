@@ -1,0 +1,24 @@
+{
+    "label": "Adult human brain",
+    "path": "adult-human-brain",
+    "elements": [
+        {"url":"gray-left-cerebellum.obj", "tags": ["gray", "left", "cerebellum"]},
+        {"url":"gray-right-cerebellum.obj", "tags": ["gray", "right", "cerebellum"]},
+        {"url":"gray-left-cerebrum.obj", "tags": ["gray", "left", "cerebrum"]},
+        {"url":"gray-right-cerebrum.obj", "tags": ["gray", "right", "cerebrum"]},
+        {"url":"white-left-cerebellum.obj", "tags": ["white", "left", "cerebellum"]},
+        {"url":"white-right-cerebellum.obj", "tags": ["white", "right", "cerebellum"]},
+        {"url":"white-left-cerebrum.obj", "tags": ["white", "left", "cerebrum"]},
+        {"url":"white-right-cerebrum.obj", "tags": ["white", "right", "cerebrum"]}
+    ],
+    "menu": [
+        {"type": "item", "tag": "cerebrum", "label": "Cerebrum", "default": true},
+        {"type": "item", "tag": "cerebellum", "label": "Cerebellum", "default": true},
+        {"type": "separator"},
+        {"type": "item", "tag": "left", "label": "Left hemisphere", "default": true},
+        {"type": "item", "tag": "right", "label": "Right hemisphere", "default": true},
+        {"type": "separator"},
+        {"type": "item", "tag": "white", "label": "White matter", "default": false},
+        {"type": "item", "tag": "gray", "label": "Gray matter", "default": true}
+    ]
+}

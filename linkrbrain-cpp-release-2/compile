@@ -1,0 +1,102 @@
+#!/bin/bash
+
+# various flags
+FLAGS="-Wno-write-strings -Wno-narrowing -Wno-trigraphs -Wno-initializer-overrides -Wno-reorder-init-list"
+
+# check if unbuffer command is present
+if [ -z `command -v unbuffer` ]; then
+    UNBUFFER=
+else
+    UNBUFFER=unbuffer
+fi
+
+# current script exits whenever a command fails
+set -e
+
+# if no argument was provided, compile src/*.cpp
+if [ $# -eq 0 ]; then
+    echo "No arguments provided, compiling src/*.cpp"
+    for SOURCE_PATH in src/*.cpp; do
+        BINARY_NAME="$(sed 's/^src\///' <<< $SOURCE_PATH)"
+        BINARY_NAME="${BINARY_NAME%.*}"
+
+        $UNBUFFER ./compile $SOURCE_PATH
+        echo "Creating symbolic link"
+        rm -f $BINARY_NAME
+        ln -sf bin/$BINARY_NAME $BINARY_NAME
+    done
+    echo
+    exit 0
+fi
+
+# configuration
+COMPILER="clang++-11 -std=c++20 -stdlib=libstdc++"
+# COMPILER="g++-8 --short-enums -std=c++17"
+LIBS="-lstdc++fs -lpthread -lpq -lmicrohttpd -lcurl -ljson-c -lz -lniftiio -lhpdf -lrsvg-2 -lcairo -lgobject-2.0"
+# LIBS="-lpthread -ljson-c"
+
+COMPILER_ARGUMENTS=""
+DEBUG=false
+NVCC=false
+NVCC_OUTPUT="bin/cuda_code.o"
+
+# arguments interpretation
+for ARGUMENT in "$@"; do
+    if [ "$ARGUMENT" == "-d" ] ; then
+        DEBUG=true
+    elif [ "$ARGUMENT" == "-cuda" ] ; then
+        NVCC=true
+        COMPILER_ARGUMENTS="$COMPILER_ARGUMENTS -D USE_CUDA_OPTIMISATION"
+    elif [ -f "$ARGUMENT" ] ; then
+        INPUT_PATH="$ARGUMENT"
+    else
+        COMPILER_ARGUMENTS="$COMPILER_ARGUMENTS $ARGUMENT"
+    fi
+done
+
+# where should the destination compiled to?
+OUTPUT_PATH="bin/$(sed 's/^src\///' <<< $INPUT_PATH)"
+OUTPUT_PATH="${OUTPUT_PATH%.*}"
+OUTPUT_DIR="$(dirname "${OUTPUT_PATH}")"
+
+# debugging options
+if [ "${DEBUG}" = true ] ; then
+    echo "Compiling for debug mode"
+    COMPILER_OPTIONS="${COMPILER_OPTIONS} -g -O0"
+else
+    COMPILER_OPTIONS="${COMPILER_OPTIONS} -O2"
+fi
+
+# compile CUDA files
+if [ "${NVCC}" = true ] ; then
+    echo "Compiling with CUDA"
+    LIBS="${LIBS} -lcudart"
+    NVCC_INPUT=`find src -type f -name *.cu`
+    NVCC_MUST_COMPILE=false
+    for NVCC_SOURCE in $NVCC_INPUT; do
+        if [ "${NVCC_SOURCE}" -nt "${NVCC_OUTPUT}" ]; then
+            NVCC_MUST_COMPILE=true
+        fi
+    done
+    if [ "${NVCC_MUST_COMPILE}" = true ]; then
+        COMMAND="nvcc --gpu-architecture=compute_35 --std=c++14 -O2 -Isrc -c ${NVCC_INPUT} -o ${NVCC_OUTPUT}"
+        echo
+        echo $COMMAND
+        time $COMMAND
+    fi
+    INPUT_PATH="$INPUT_PATH $NVCC_OUTPUT"
+fi
+
+# compile C++ files
+# ADDITIONAL_FILES=`find src/*/* -type f -name *.cpp`
+mkdir -p "${OUTPUT_DIR}"
+COMMAND="${COMPILER} ${COMPILER_OPTIONS} -fdiagnostics-color=always \
+    ${COMPILER_ARGUMENTS} \
+    -Isrc \
+    ${ADDITIONAL_FILES} \
+    ${INPUT_PATH} \
+    ${FLAGS} \
+    ${LIBS} \
+    -o ${OUTPUT_PATH}"
+echo $COMMAND
+time ${COMMAND}

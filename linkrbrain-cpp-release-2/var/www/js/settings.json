@@ -1,0 +1,35 @@
+{	"correlation":
+	{	"type":		'function'
+	}
+,	"view":
+	{	"type":		'3D'
+	,	"matters":
+		{	"white":	false
+		,	"gray":		true
+		}
+	,	"hemispheres":
+		{	"left":		true
+		,	"right":	true
+		}
+	,	"opacity":	0.9
+	,	"points":
+		{	"radius":	5
+		,	"opacity":	0.5
+		}
+	,	"zones":
+		{	"centers":	true
+		,	"surfaces":	false
+		,	"volumes":	false
+		}
+	,	"position":
+		{	"x":		0
+		,	"y":		0
+		,	"z":		0
+		}
+	,	"box":
+		{	x		:	{min:-90 , max:+90}
+		,	y		:	{min:-126, max:+90}
+		,	z		:	{min:-72 , max:+108}
+		}
+	}
+}

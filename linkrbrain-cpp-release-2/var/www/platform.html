@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<link rel="stylesheet" href="/style.css" type="text/css"/>
+		<link rel="stylesheet" href="/frameset.css" type="text/css"/>
+		<link rel="stylesheet" href="/query.css" type="text/css"/>
+		<title>Query</title>
+	</head>
+	<body>
+		<div id="contents"></div>
+		<script type="text/javascript" src="/lib.js"></script>
+		<script type="text/javascript" src="/script.js"></script>
+		<script type="text/javascript">
+			window.onresize = function(){
+				var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				document.body.style.fontSize = Math.round(8 + width / 160) + 'px';
+			};
+			window.onresize();
+		</script>
+		<script type="text/javascript" src="/three.js"></script>
+		<script type="text/javascript" src="/frameset.js"></script>
+		<script type="text/javascript" src="/platform.js"></script>
+	</body>
+</html>

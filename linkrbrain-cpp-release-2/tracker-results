@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+import time
+import datetime
+
+tolerance = 600
+
+
+class WorkingPeriod(object):
+    def __init__(self, timestamp_start, timestamp_end, files=set()):
+        self.start = datetime.datetime.fromtimestamp(timestamp_start)
+        self.end = datetime.datetime.fromtimestamp(timestamp_end)
+        self.delta = self.end - self.start
+        self.files = sorted(files)
+
+    def show(self):
+        if self.delta < datetime.timedelta(minutes = 1):
+            return
+        print('%s  ->  %s  a.k.a  %s' % (
+            self.start,
+            self.end,
+            self.delta,
+        ))
+        for file in self.files:
+            print('   %s' % (file,))
+
+
+first_timestamp_seconds = None
+last_timestamp_seconds = None
+files = set()
+total_time = datetime.timedelta()
+for line in open('log/tracker.log'):
+    columns = line.split()
+    if len(columns) == 0:
+        continue
+    timestamp_string = columns[0]
+    files.add(columns[2])
+    timestamp_datetime = datetime.datetime.strptime(timestamp_string, "%Y-%m-%dT%H:%M:%S")
+    timestamp_seconds = time.mktime(timestamp_datetime.timetuple())
+    if first_timestamp_seconds is None:
+        first_timestamp_seconds = timestamp_seconds
+    elif timestamp_seconds - last_timestamp_seconds > tolerance:
+        period = WorkingPeriod(first_timestamp_seconds, last_timestamp_seconds, files)
+        period.show()
+        total_time += period.delta
+        first_timestamp_seconds = timestamp_seconds
+        files = set()
+    last_timestamp_seconds = timestamp_seconds
+period = WorkingPeriod(first_timestamp_seconds, last_timestamp_seconds, files)
+period.show()
+total_time += period.delta
+print('\nTOTAL  %s' % (total_time,))

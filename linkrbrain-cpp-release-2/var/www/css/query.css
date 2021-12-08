@@ -1,0 +1,119 @@
+html, body	{overflow:hidden;background:#FFF}
+
+.query	{overflow:hidden;padding:1.5em 2em 1em 10em;position:relative}
+.query, .query .frameset	{width:100%;height:100%}
+
+	.query .frameset .frame, .query h1	{border:solid 1px #AAA;font-size:1em}
+	
+	.query .frameset .frame, 
+	.query h1
+		{box-shadow:inset 0.1em 0.1em 0.5em rgba(0,0,0,0.5)}
+	.query .frameset .view .container ul.controls,
+	.query .frameset .view .container ul.controls li dd ul,
+	.query .frameset .frame .title
+		{box-shadow:0.1em 0.1em 0.5em rgba(0,0,0,0.5)}
+
+	.query .sidebar	{position:absolute;left:0;top:0.5em}
+		.query .sidebar li	{font-size:1em;padding:0.5em 1em 0.5em 1em}
+
+	.query h1	{margin-bottom:1em;cursor:pointer;padding:1em 0.5em}
+	.query h1:hover	{background:#EEE}
+		.query h1 span	{color:#444;font-size:1.5em;line-height:1.25em;margin-left:0.25em}
+		.query h1:hover span	{color:#000}
+		.query h1 span.untitled	{color:#AAA}
+		.query h1:hover span.untitled	{color:#888}
+		.query h1 div	{width:2em;height:2em;position:relative;overflow:hidden;float:right}
+			.query h1 div img	{width:2em;position:absolute;left:0;top:-14em}
+	
+	.query .frameset	{width:400px;height:400px}
+	
+		.query .frameset .groups	{}
+			
+			.query .frameset .groups dl	{float:left;outline:solid 2px #888;margin:0 16px 16px 2px;background:#FFF}
+				
+				.query .frameset .groups dt	{padding:1em 0.5em;color:#FFF;border-bottom:solid 1px #888;font-weight:bold;letter-spacing:0.1em}
+					.query .frameset .groups dt button	{float:right;background:transparent;color:#FFF;opacity:0.25;margin-left:0.5em}
+					.query .frameset .groups dt button:hover	{opacity:0.75}
+				
+				.query .frameset .groups dd	{border-top:solid 1px #CCC;padding:0.5em;padding-right:2em;position:relative}
+				.query .frameset .groups dt+dd	{border-top:0}
+				.query .frameset .groups dd.add	{color:#888;padding:0.5em;cursor:pointer;font-weight:bold}
+				.query .frameset .groups dd.add:hover	{color:#000;background:#E8E8E8}
+				.query .frameset .groups dd.add:active	{color:#444}
+					.query .frameset .groups dd button	{position:absolute;font-weight:bold;background:#FFF;color:#AAA;right:0.5em;top:0.5em}
+					.query .frameset .groups dd button:hover	{color:#000}
+					
+					
+
+		.query .frameset .correlations	{}
+			
+			.query .frameset .correlations .container	{overflow:visible}
+			
+				.query .frameset .correlations table	{border-collapse:collapse}
+					.query .frameset .correlations thead	{}
+							.query .frameset .correlations th	{background:#EEE;color:#999;padding:0 1em;height:3em;text-align:center;border:solid #BBB 1px;cursor:pointer;border-width:1px 0}
+							.query .frameset .correlations th.headerSortDown, .query .frameset .correlations th.headerSortUp	{background:#DDD}
+							.query .frameset .correlations th:first-child	{background:transparent;border-top:0;border-right-width:1px}
+							.query .frameset .correlations th:last-child	{border-right-width:1px}
+					.query .frameset .correlations tbody	{margin-top:2px}
+							.query .frameset .correlations td	{color:#888;padding:0.3em 1em;text-align:left}
+							.query .frameset .correlations tr.odd td	{background:#FFF}
+							.query .frameset .correlations tr.even td	{background:#DDD;color:#666}
+							.query .frameset .correlations td:first-child	{border-left:solid 1px #BBB}
+							.query .frameset .correlations td:last-child	{border-right:solid 1px #BBB}
+							.query .frameset .correlations tr:last-child td	{border-bottom:solid 1px #BBB}
+						.query .frameset .correlations tbody tr:hover	{}
+							.query .frameset .correlations tbody tr:hover td	{}
+		
+		
+		
+		.query .frameset .view	{}
+			.query .frameset .view .container	{overflow:hidden;margin:0;padding:0;text-align:center}
+				.query .frameset .view .container canvas	{display:inline-block}
+				.query .frameset .view .container ul.controls	{display:none;position:absolute;top:0;left:0.4em;width:100%;text-align:left;border-bottom:solid 1px #DDD;background:#FFF;opacity:0.8}
+				.query .frameset .view .container:hover ul.controls 	{display:block}
+				.query .frameset .view .container ul.controls *	{cursor:pointer;color:#000}
+					.query .frameset .view .container ul.controls li	{display:inline-block}
+						.query .frameset .view .container ul.controls li dt	{padding:0.5em 3.5em 0.5em 0.5em;line-height:1em;border:solid #CCC;border-width:0 1px}
+						.query .frameset .view .container ul.controls li:hover *	{background:#EEE}
+						.query .frameset .view .container ul.controls li dd	{position:relative}
+							.query .frameset .view .container ul.controls li dd ul	{display:none;position:absolute;left:0;top:0;width:100%;background:#EEE}
+							.query .frameset .view .container ul.controls li:hover dd ul	{display:block;=}
+								.query .frameset .view .container ul.controls li dd ul li	{display:block;padding:0.5em 1em}
+								.query .frameset .view .container ul.controls li dd ul li.separator	{padding:0;margin:0.5em;border-bottom:solid 1px #CCC}
+								.query .frameset .view .container ul.controls li dd ul li:hover	{background:#DDD}
+									.query .frameset .view .container ul.controls li dd ul li div	{float:right}
+										.query .frameset .view .container ul.controls li dd ul li div span	{font-weight:bold;padding:0 0.2em}
+										.query .frameset .view .container ul.controls li dd ul li div button	{width:2em}
+									.query .frameset .view .container ul.controls li dd ul li div.slider	{width:4em;height:1em;background:#FFF;box-shadow:inset 0 0 0.3em}
+										.query .frameset .view .container ul.controls li dd ul li div.slider	div		{position:absolute;left:0;top:0em;width:1em;height:1em;box-shadow:0 0 0.3em;background:#EEE}
+				.query .frameset .view .container .view2D	{position:relative;display:inline-block;margin:0 auto}
+					.query .frameset .view .container .view-slice	{position:absolute;overflow:hidden}
+						.query .frameset .view .container .view-slice *	{cursor:crosshair}
+						.query .frameset .view .container .view-slice img	{position:absolute;width:100%;left:0;top:0}
+						.query .frameset .view .container .view-slice .paper	{position:absolute;width:100%;height:100%;left:0;top:0}
+						.query .frameset .view .container .view-slice .overlay	{position:absolute;width:100%;height:100%;left:0;top:0}
+						.query .frameset .view .container .view-slice label	{color:#DDD;display:block;margin-left:1em;margin-top:1em}
+							.query .frameset .view .container .view-slice input	{color:#EEE;background:#000;width:4em;cursor:text}
+							.query .frameset .view .container .view-slice input:hover	{border-bottom:solid 1px #444;color:#FFF}
+							.query .frameset .view .container .view-slice input:focus	{border-bottom:solid 1px #666}
+		
+		.query .frameset .graph	{}
+			.query .frameset .graph .container	{overflow:hidden;padding:0}
+			
+			
+
+	.window	{}
+			.window .tab div.list-search, .window .tab div.list-details, .window .tab table.list	{margin:2.5em;margin-bottom:0;outline:solid 1px #AAA}
+				.window .tab div.list-search input	{padding:0.3em 0;width:100%;line-height:1.8em;background:url(/search.png) no-repeat #FFF center right}
+			.window .tab div.list-search	{margin-bottom:1em}
+			.window .tab div.list-details	{outline:0;margin-top:0;margin-bottom:0}
+				.window .tab div.list-details ul	{float:right}
+					.window .tab div.list-details li	{float:left;padding:0 0.2em;color:#888}
+						.window .tab div.list-details button	{background:#FFF;color:#888;outline:solid 1px #CCC;padding:0.2em}
+						.window .tab div.list-details button:hover	{color:#444;outline-color:#888;background:#EEE}
+						.window .tab div.list-details button.active	{color:#444;outline-color:#888;background:#DDD}
+			.window .tab table.list	{overflow:auto;margin-top:1em;margin-bottom:1em}
+				.window .tab table.list tr	{opacity:0.8;cursor:pointer}
+				.window .tab table.list tr:hover	{opacity:1}
+					.window .tab table.list td	{padding:0.2em}

@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+import datetime
+import sys
+
+
+duration = 4 * 3600
+interval = 60
+files = (
+    './src/Formats/BinaryFormatter.hpp',
+    './src/Formats/Format.hpp',
+    './src/Formats/Formatter.hpp',
+    './src/Formats/Formatting.hpp',
+    './src/Formats/JSONFormatter.hpp',
+    './src/Formats/JSONParser.hpp',
+    './src/Formats/Parser.hpp',
+    './src/Formats/TextFormatter.hpp',
+    './src/Formats/TextParser.hpp',
+)
+with_creation = True
+ending_point = datetime.datetime(2020, 9, 5, 10)
+# ending_point = datetime.datetime.now()
+
+
+# 2020-05-06T11:24:29 MODIFY ./log/tracker.log
+# 2019-10-04T12:18:06 CREATE ./bin/tests/parsing
+
+
+f = open('./log/tracker.log', 'a')
+f.write('\n')
+is_first = True
+for delta in range(-duration, -interval, interval):
+    t = ending_point + datetime.timedelta(seconds = delta)
+    t = str(t).replace(' ', 'T').split('.')[0]
+    action = 'MODIFY'
+    if with_creation:
+        if is_first:
+            is_first = False
+            action = 'CREATE'
+    for file in files:
+        f.write('%s %s %s [GENERATED]\n' % (t, action, file))
+f.write('\n')

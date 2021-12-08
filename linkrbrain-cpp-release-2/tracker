@@ -1,0 +1,7 @@
+#!/bin/bash
+inotifywait \
+    --timefmt "%Y-%m-%dT%H:%M:%S" --format "%T %e %w%f" \
+    -e MOVE -e DELETE -e MODIFY -e CREATE \
+    --monitor --recursive \
+    --exclude '\./(log|\.git)/.*' . | \
+        stdbuf -oL uniq >> "./log/tracker.log"

@@ -1,0 +1,17 @@
+{
+    "label": "Neonatal human brain",
+    "path": "neonatal-human-brain",
+    "elements": [
+        {"url":"gray-left.obj", "tags": ["gray", "left"]},
+        {"url":"gray-right.obj", "tags": ["gray", "right"]},
+        {"url":"white-left.obj", "tags": ["white", "left"]},
+        {"url":"white-right.obj", "tags": ["white", "right"]}
+    ],
+    "menu": [
+        {"type": "item", "tag": "left", "label": "Left hemisphere", "default": true},
+        {"type": "item", "tag": "right", "label": "Right hemisphere", "default": true},
+        {"type": "separator"},
+        {"type": "item", "tag": "white", "label": "White matter", "default": true},
+        {"type": "item", "tag": "gray", "label": "Gray matter", "default": false}
+    ]
+}

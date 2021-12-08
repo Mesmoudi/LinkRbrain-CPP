@@ -1,0 +1,7 @@
+  GNU nano 4.8                                                            tmp/.gitignore                                                                      
+# ignore everything...
+*
+
+# ..but these
+!.gitignore
+*.template.*

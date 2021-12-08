@@ -1,0 +1,6 @@
+input.hue	{width:16px;height:16px}
+
+
+div.hue {position:fixed;cursor:pointer;padding:4px;background:#DDD;border:solid 1px #999;border-top:0;border-left:0}
+	div.hue img	{width:100px;height:8px;border:solid 1px #888}
+	div.hue div {width:6px;height:6px;position:absolute;top:7px;border:solid 2px #000;border-color:rgba(0,0,0,0.5);border-radius:4px}
